@@ -1,8 +1,8 @@
 # pathfind
 
 A small grid pathfinder in Go. It reads an ASCII map, runs a breadth-first
-search from the start tile to the goal, and prints the map with the shortest
-path drawn on it.
+search from the start tile to the goal, and animates the search in the terminal:
+the frontier floods outward (`o`), then the shortest path is traced back (`*`).
 
 BFS on an unweighted grid is guaranteed to find a shortest path, which is why
 it's the starting point here.
