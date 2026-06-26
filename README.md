@@ -24,8 +24,13 @@ Each map has exactly one `$` and one `@`, and movement is 4-directional.
 ## Usage
 
 ```sh
-go run . maps/10.map
+go run . maps/10.map              # animate BFS on a map
+go run . -algo bfs maps/10.map    # pick the algorithm
+go run . -delay 0 maps/10.map     # no frame pause
 ```
+
+`-algo` selects the search algorithm (currently `bfs`); more can be registered
+in `algorithms` without touching the CLI or the animation.
 
 The output is the original map with the path marked using `*`, followed by the
 path length:
@@ -40,5 +45,5 @@ path length: 48 steps
 
 ## Next steps
 
-- Add A\* and Dijkstra to compare against BFS on the same fixtures.
+- Register A\* and Dijkstra as additional `-algo` choices to compare against BFS.
 - Add `unsolvable-*.map` fixtures to exercise the no-path branch.

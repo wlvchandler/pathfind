@@ -45,11 +45,36 @@ func (q *Queue[T]) Dequeue() (T, bool) {
 	return value, true
 }
 
+// A solver searches grid from start to goal. It returns the path and explored,
+// the order cells were visited, which the animation replays as the search
+// frontier.
+type solver func(grid []string) (path, explored []Coord, err error)
+
+var algorithms = map[string]solver{
+	"bfs": bfs,
+}
+
+func algoNames() string {
+	names := make([]string, 0, len(algorithms))
+	for name := range algorithms {
+		names = append(names, name)
+	}
+	slices.Sort(names)
+	return strings.Join(names, ", ")
+}
+
 func main() {
+	algo := flag.String("algo", "bfs", "search algorithm: "+algoNames())
 	delay := flag.Duration("delay", 40*time.Millisecond, "pause between animation frames")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintf(os.Stderr, "usage: %s [-delay d] <map-file>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "usage: %s [-algo name] [-delay d] <map-file>\n", os.Args[0])
+		os.Exit(2)
+	}
+
+	solve, ok := algorithms[*algo]
+	if !ok {
+		fmt.Fprintf(os.Stderr, "unknown algo %q (have: %s)\n", *algo, algoNames())
 		os.Exit(2)
 	}
 
@@ -76,9 +101,8 @@ func readGrid(path string) ([]string, error) {
 	return strings.Split(strings.TrimRight(string(data), "\n"), "\n"), nil
 }
 
-// BFS, so the path it finds is a shortest one. explored is the order cells were
-// visited, which the animation replays as the expanding search frontier.
-func solve(grid []string) (path, explored []Coord, err error) {
+// bfs explores in expanding rings, so the first path it reaches is a shortest one.
+func bfs(grid []string) (path, explored []Coord, err error) {
 	start, err := find(grid, startTile)
 	if err != nil {
 		return nil, nil, err
